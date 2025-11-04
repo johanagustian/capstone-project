@@ -1,0 +1,28 @@
+{
+  "name": "asah-backend",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Backend Node.js Project Capstone ASAH",
+  "main": "src/app.js",
+  "scripts": {
+    "start": "node src/app.js",
+    "dev": "nodemon src/app.js"
+  },
+  "dependencies": {
+    "express": "*",
+    "mysql2": "*",
+    "cors": "*",
+    "dotenv": "*",
+    "axios": "*",
+    "bcryptjs": "*",
+    "jsonwebtoken": "*"
+  },
+  "devDependencies": {
+    "nodemon": "*"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "license": "UNLICENSED"
+}
