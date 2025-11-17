@@ -5,7 +5,7 @@ const router = Router()
 
 router.post('/register', handleRegister)
 router.post('/login', handleLogin)
-router.post('/dashboard', handleDashboard)
+// router.post('/dashboard', handleDashboard)
 
 export default router
 

@@ -76,13 +76,13 @@ if (loginForm) {
       if (token) {
         localStorage.setItem("authToken", token);
         localStorage.setItem("authUser", JSON.stringify(data?.user || {}));
-        if(roleId == 1) {
+        if (roleId === 1) {
+          window.location.href = "/dashboardShipping.html";
+        } else if (roleId === 2) {
           window.location.href = "/dashboardMining.html";
-        } else if (roleId == 2){
-          window.location.href = "/dashboardShipping.html"
+        } else {
+          setMessage(loginMsg, "Role tidak terpilih", "error");
         }
-        else {
-        } setMessage(loginMsg, "Role tidak terpilih")
       } else {
         setMessage(loginMsg, "Token tidak diterima dari server.", "error");
       }

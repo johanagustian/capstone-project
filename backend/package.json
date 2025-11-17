@@ -10,13 +10,13 @@
     "dev": "nodemon src/app.js"
   },
   "dependencies": {
-    "express": "*",
-    "mysql2": "*",
-    "cors": "*",
-    "dotenv": "*",
     "axios": "*",
     "bcryptjs": "*",
-    "jsonwebtoken": "*"
+    "cors": "^2.8.5",
+    "dotenv": "*",
+    "express": "*",
+    "jsonwebtoken": "*",
+    "mysql2": "*"
   },
   "devDependencies": {
     "nodemon": "*"
