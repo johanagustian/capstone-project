@@ -103,7 +103,6 @@ if (loginForm) {
   });
 }
 
-// Perbaiki link register
 const registerLink = document.getElementById("register-link");
 if (registerLink && roleParam) {
   registerLink.href = `/src/pages/auth/register/register.html?role=${roleParam}`;

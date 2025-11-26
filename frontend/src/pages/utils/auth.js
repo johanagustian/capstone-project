@@ -1,6 +1,5 @@
 import { ACCESS_TOKEN_KEY } from "./config.js";
 
-// Hapus import yang tidak ada dan buat fungsi sederhana untuk mendapatkan route aktif
 const getActiveRoute = () => {
   const hash = window.location.hash;
   return hash ? hash.replace("#", "") : window.location.pathname;
