@@ -1,4 +1,4 @@
-const API_BASE = "http://localhost:3000/api/auth";
+const API_BASE = (import.meta.env.VITE_API_BASE || "http://localhost:3000/api/auth");
 import { BASE_URL } from "./config";
 import { getAccessToken } from "./auth";
 
