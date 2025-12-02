@@ -15,15 +15,6 @@ const allowedEnvOrigins = (process.env.FRONTEND_URL || "")
   .split(",")
   .map((s) => s.trim())
   .filter(Boolean);
-const vercelSlugs = allowedEnvOrigins
-  .map((o) => {
-    const m = o.match(/^https?:\/\/([^/]+)\.vercel\.app$/);
-    return m ? m[1] : null;
-  })
-  .filter(Boolean);
-const allowedPreviewRegexes = vercelSlugs.map(
-  (slug) => new RegExp(`^https?:\\/\\/${slug}-[^.]+\\.vercel\\.app$`)
-);
 const defaultDevOrigins = [
   "http://localhost:5173",
   "http://localhost:4173",
@@ -36,8 +27,7 @@ app.use(
       if (!origin) return cb(null, true);
       if (
         allowedEnvOrigins.includes(origin) ||
-        defaultDevOrigins.includes(origin) ||
-        allowedPreviewRegexes.some((re) => re.test(origin))
+        defaultDevOrigins.includes(origin)
       ) {
         return cb(null, true);
       }
