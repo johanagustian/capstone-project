@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { getSummary } from "../controllers/planOptimizationController.js";
+import { getSummary } from "../controllers/ai_summary_controller.js";
 
 const router = Router();
 

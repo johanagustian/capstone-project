@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 <!DOCTYPE html>
 <html lang="en">
 
@@ -7,472 +6,226 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Mining Operations Dashboard</title>
   <link rel="stylesheet" href="../../../style/mine-planner/style.css" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet" />
 </head>
 
 <body>
-  <div class="dashboard-grid">
-    <aside class="sidebar">
-      <div class="profile-pic">
-        <img src="../../../../public/assets/mine-planner-image/mine-planner-profile.png" alt="profile"
-          class="menu-icon" />
-      </div>
-
-      <h3 class="profile-name">Nino</h3>
-      <p class="profile-role">Mine Planner</p>
-
-      <button class="btn-sidebar btn-primary">Akses Mine Hub</button>
-      <button class="btn-sidebar btn-secondary">Pengaturan Akun</button>
-
-      <div class="logout-container">
-        <button class="btn-logout">Keluar (Logout)</button>
-      </div>
-    </aside>
-
-    <main class="main-content">
-      <h1 style="
-            font-size: 30px;
-            font-weight: 700;
-            margin-bottom: 32px;
-            color: #1f2937;
-          ">
-        Dashboard Mine Planner
-      </h1>
-
-      <section id="dashboard-widgets" class="widgets-grid">
-        <div class="card" aria-label="Grafik Target Tonase Mingguan">
-          <h2 style="font-size: 16px; font-weight: 700; margin: 0 0 8px">
-            Target Tonase Mingguan
-          </h2>
-          <canvas id="tonnageChart" width="400" height="220" role="img"
-            aria-label="Bar chart target tonase mingguan"></canvas>
-        </div>
-        <div class="card" aria-label="Ketersediaan Alat">
-          <h2 style="font-size: 16px; font-weight: 700; margin: 0 0 8px">
-            Ketersediaan Alat
-          </h2>
-          <canvas id="availabilityChart" width="400" height="220" role="img"
-            aria-label="Pie chart ketersediaan alat"></canvas>
-          <div id="availabilityLegend" class="legend" aria-label="Keterangan pie chart"></div>
-        </div>
-        <div class="card" aria-live="polite" aria-label="Cuaca Terkini">
-          <h2 style="font-size: 16px; font-weight: 700; margin: 0 0 8px">
-            Cuaca Terkini
-          </h2>
-          <div id="weatherCard" style="display: flex; flex-direction: column; gap: 6px">
-            <div id="weatherSummary">Memuat cuaca...</div>
-            <div id="weatherMeta" style="font-size: 12px; color: #555"></div>
+  <div class="container-fluid">
+    <div class="row">
+      <aside
+        class="sidebar col-2 col-xl-2 bg-body-tertiary border-end min-vh-100 d-flex flex-column align-items-center py-4">
+        <div class="card w-100 text-center border-0 bg-transparent mb-3">
+          <div class="card-body">
+            <img src="../../../../public/assets/mine-planner-image/mine-planner-profile.png" alt="profile"
+              class="img-fluid rounded-circle border border-3 mb-3"
+              style="width: 96px; height: 96px; object-fit: cover" />
+            <h3 class="fs-5 fw-bold mb-0">Nino</h3>
+            <p class="text-muted mb-0">Mine Planner</p>
           </div>
         </div>
-        <div class="card" aria-label="Ringkasan Kru">
-          <h2 style="font-size: 16px; font-weight: 700; margin: 0 0 8px">
-            Ringkasan Kru
-          </h2>
-          <div id="crewStats" class="stats-row" role="list" aria-label="Statistik karyawan"></div>
+
+        <nav class="w-100 mb-3">
+          <ul class="nav nav-pills flex-column w-100">
+            <li class="nav-item">
+              <a class="nav-link active" aria-current="page" href="./home_planner_page.html"><i
+                  class="bi bi-clipboard-data"></i> Dashboard</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="../target_production/target_production.html"><i
+                  class="bi bi-clipboard-check"></i> Planning</a>
+            </li>
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="bi bi-database"></i> Database
+              </a>
+              <ul class="dropdown-menu w-100">
+                <li>
+                  <a class="dropdown-item" href="../crew/crew_management_page.html"><i class="bi bi-people"></i>
+                    Informasi Karyawan</a>
+                </li>
+                <li>
+                  <a class="dropdown-item" href="../equipment/equipment.html"><i class="bi bi-truck"></i> Ketersediaan &
+                    Status Alat
+                    Berat</a>
+                </li>
+                <li>
+                  <a class="dropdown-item" href="../pit/pit.html"><i class="bi bi-diagram-3"></i> Manajemen Lokasi
+                    Tambang
+                    (Pit)</a>
+                </li>
+                <li>
+                  <a class="dropdown-item" href="../target_production/target_production.html"><i
+                      class="bi bi-graph-up"></i> Rencana Produksi &
+                    Blending</a>
+                </li>
+              </ul>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#" id="openChatMine"><i class="bi bi-chat-dots"></i> Free Chat</a>
+            </li>
+          </ul>
+        </nav>
+
+        <div class="logout-container w-100 mt-auto px-2">
+          <button class="btn btn-danger w-100" id="logout-btn">
+            Keluar (Logout)
+          </button>
         </div>
-        <div class="card" aria-label="Weekly Plan">
-          <h2 style="font-size: 16px; font-weight: 700; margin: 0 0 8px">
-            Weekly Plan
-          </h2>
-          <table id="weeklyPlanTable" class="table" aria-label="Tabel rencana mingguan">
-            <thead>
-              <tr>
-                <th>Week</th>
-                <th>Year</th>
-                <th>Target Tonnage</th>
-                <th>Calori</th>
-                <th>Ash Max</th>
-                <th>Mine</th>
-                <th>Shipping</th>
-              </tr>
-            </thead>
-            <tbody></tbody>
-          </table>
-        </div>
-      </section>
+      </aside>
 
-
-
-      <div class="menu-grid">
-        <a href="../mine_plan/mine_plan.html" class="menu-card">
-          <img src="../../../../public/assets/mine-planner-image/production-plan-icon.png" alt="Production Icon"
-            class="menu-icon" />
-          <p class="menu-label">Create Plan</p>
-        </a>
-
-        <a href="#" class="menu-card">
-          <img src="../../../../public/assets/mine-planner-image/ai-recomendation-icon.png" alt="AI Icon"
-            class="menu-icon" />
-          <p class="menu-label">AI Optimasi</p>
-        </a>
-
-        <a href="../crew/crew_management_page.html" class="menu-card">
-          <img src="../../../../public/assets/mine-planner-image/crew-icon.jfif" alt="Karyawan Icon"
-            class="menu-icon" />
-          <p class="menu-label">Manajemen Kru</p>
-        </a>
-
-        <a href="../equipment/equipment.html" class="menu-card">
-          <img src="../../../../public/assets/mine-planner-image/equipment-icon.jfif" alt="Alat Berat Icon"
-            class="menu-icon" />
-          <p class="menu-label">Ketersediaan Alat</p>
-        </a>
-
-        <a href="../pit/pit.html" class="menu-card">
-          <img src="../../../../public/assets/mine-planner-image/pit-icon.png" alt="Pit Icon" class="menu-icon" />
-          <p class="menu-label">Status Pit</p>
-        </a>
-
-        <a href="../target_production/target_production.html" class="menu-card">
-          <img src="../../../../public/assets/mine-planner-image/production-plan-icon.png" alt="Production Icon"
-            class="menu-icon" />
-          <p class="menu-label">Target Produksi</p>
-        </a>
-      </div>
-    </main>
-
-    <div class="floating-chat">Chatbot AI</div>
-  </div>
-
-  <script type="module" src="./dashboard.js"></script>
-</body>
-
-</html>
-=======
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Mining Operations Dashboard</title>
-    <link rel="stylesheet" href="../../../style/mine-planner/style.css" />
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-    />
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"
-      rel="stylesheet"
-    />
-  </head>
-  <body>
-    <div class="container-fluid">
-      <div class="row">
-        <aside
-          class="sidebar col-2 col-xl-2 bg-body-tertiary border-end min-vh-100 d-flex flex-column align-items-center py-4"
-        >
-          <div class="card w-100 text-center border-0 bg-transparent mb-3">
-            <div class="card-body">
-              <img
-                src="../../../../public/assets/mine-planner-image/mine-planner-profile.png"
-                alt="profile"
-                class="img-fluid rounded-circle border border-3 mb-3"
-                style="width: 96px; height: 96px; object-fit: cover"
-              />
-              <h3 class="fs-5 fw-bold mb-0">Nino</h3>
-              <p class="text-muted mb-0">Mine Planner</p>
-            </div>
-          </div>
-
-          <nav class="w-100 mb-3">
-            <ul class="nav nav-pills flex-column w-100">
-              <li class="nav-item">
-                <a
-                  class="nav-link active"
-                  aria-current="page"
-                  href="./home_planner_page.html"
-                  ><i class="bi bi-clipboard-data"></i> Dashboard</a
-                >
-              </li>
-              <li class="nav-item">
-                <a
-                  class="nav-link"
-                  href="../target_production/target_production.html"
-                  ><i class="bi bi-clipboard-check"></i> Planning</a
-                >
-              </li>
-              <li class="nav-item dropdown">
-                <a
-                  class="nav-link dropdown-toggle"
-                  href="#"
-                  data-bs-toggle="dropdown"
-                  aria-expanded="false"
-                >
-                  <i class="bi bi-database"></i> Database
-                </a>
-                <ul class="dropdown-menu w-100">
-                  <li>
-                    <a
-                      class="dropdown-item"
-                      href="../crew/crew_management_page.html"
-                      ><i class="bi bi-people"></i> Informasi Karyawan</a
-                    >
-                  </li>
-                  <li>
-                    <a class="dropdown-item" href="../equipment/equipment.html"
-                      ><i class="bi bi-truck"></i> Ketersediaan & Status Alat
-                      Berat</a
-                    >
-                  </li>
-                  <li>
-                    <a class="dropdown-item" href="../pit/pit.html"
-                      ><i class="bi bi-diagram-3"></i> Manajemen Lokasi Tambang
-                      (Pit)</a
-                    >
-                  </li>
-                  <li>
-                    <a
-                      class="dropdown-item"
-                      href="../target_production/target_production.html"
-                      ><i class="bi bi-graph-up"></i> Rencana Produksi &
-                      Blending</a
-                    >
-                  </li>
-                </ul>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="#" id="openChatMine"
-                  ><i class="bi bi-chat-dots"></i> Free Chat</a
-                >
-              </li>
-            </ul>
-          </nav>
-
-          <div class="logout-container w-100 mt-auto px-2">
-            <button class="btn btn-danger w-100" id="logout-btn">
-              Keluar (Logout)
-            </button>
-          </div>
-        </aside>
-
-        <main class="main-content col">
-          <h1
-            style="
+      <main class="main-content col">
+        <h1 style="
               font-size: 30px;
               font-weight: 700;
               margin-bottom: 32px;
               color: #1f2937;
-            "
-          >
-            Dashboard Mine Planner
-          </h1>
+            ">
+          Dashboard Mine Planner
+        </h1>
 
-          <section id="kpi-row" class="row g-3 mb-3">
-            <div class="card col" aria-label="Tonnage Hari Ini">
-              <div class="d-flex justify-content-between align-items-center">
-                <div>
-                  <div class="fw-bold">Tonnage Hari Ini</div>
-                  <div id="kpiTonnageToday" class="fs-4">0</div>
-                </div>
-                <i class="bi bi-bar-chart fs-3 text-primary"></i>
+        <section id="kpi-row" class="row g-3 mb-3">
+          <div class="card col" aria-label="Tonnage Hari Ini">
+            <div class="d-flex justify-content-between align-items-center">
+              <div>
+                <div class="fw-bold">Tonnage Hari Ini</div>
+                <div id="kpiTonnageToday" class="fs-4">0</div>
               </div>
+              <i class="bi bi-bar-chart fs-3 text-primary"></i>
             </div>
-            <div class="card col" aria-label="Equipment Ready (%)">
-              <div class="fw-bold">Equipment Ready (%)</div>
-              <div class="progress mt-2" style="height: 10px">
-                <div
-                  id="kpiEquipmentReadyBar"
-                  class="progress-bar"
-                  role="progressbar"
-                  style="width: 0%"
-                  aria-valuenow="0"
-                  aria-valuemin="0"
-                  aria-valuemax="100"
-                ></div>
-              </div>
-              <div id="kpiEquipmentReadyText" class="mt-2 small text-muted">
-                0 / 0
-              </div>
+          </div>
+          <div class="card col" aria-label="Equipment Ready (%)">
+            <div class="fw-bold">Equipment Ready (%)</div>
+            <div class="progress mt-2" style="height: 10px">
+              <div id="kpiEquipmentReadyBar" class="progress-bar" role="progressbar" style="width: 0%" aria-valuenow="0"
+                aria-valuemin="0" aria-valuemax="100"></div>
             </div>
-            <div class="card col" aria-label="Employee Attendance (%)">
-              <div class="fw-bold">Employee Attendance (%)</div>
-              <div class="progress mt-2" style="height: 10px">
-                <div
-                  id="kpiAttendanceBar"
-                  class="progress-bar bg-success"
-                  role="progressbar"
-                  style="width: 0%"
-                  aria-valuenow="0"
-                  aria-valuemin="0"
-                  aria-valuemax="100"
-                ></div>
-              </div>
-              <div id="kpiAttendanceText" class="mt-2 small text-muted">
-                0 / 0
-              </div>
+            <div id="kpiEquipmentReadyText" class="mt-2 small text-muted">
+              0 / 0
             </div>
-            <div class="card col" aria-label="Production vs Weekly Target">
-              <div class="fw-bold">Production vs Weekly Target</div>
-              <div class="progress mt-2" style="height: 10px">
-                <div
-                  id="kpiWeeklyProgressBar"
-                  class="progress-bar bg-info"
-                  role="progressbar"
-                  style="width: 0%"
-                  aria-valuenow="0"
-                  aria-valuemin="0"
-                  aria-valuemax="100"
-                ></div>
-              </div>
-              <div id="kpiWeeklyProgressText" class="mt-2 small text-muted">
-                0 / 0 Ton
-              </div>
+          </div>
+          <div class="card col" aria-label="Employee Attendance (%)">
+            <div class="fw-bold">Employee Attendance (%)</div>
+            <div class="progress mt-2" style="height: 10px">
+              <div id="kpiAttendanceBar" class="progress-bar bg-success" role="progressbar" style="width: 0%"
+                aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
             </div>
-          </section>
+            <div id="kpiAttendanceText" class="mt-2 small text-muted">
+              0 / 0
+            </div>
+          </div>
+          <div class="card col" aria-label="Production vs Weekly Target">
+            <div class="fw-bold">Production vs Weekly Target</div>
+            <div class="progress mt-2" style="height: 10px">
+              <div id="kpiWeeklyProgressBar" class="progress-bar bg-info" role="progressbar" style="width: 0%"
+                aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+            </div>
+            <div id="kpiWeeklyProgressText" class="mt-2 small text-muted">
+              0 / 0 Ton
+            </div>
+          </div>
+        </section>
 
-          <section id="dashboard-widgets" class="widgets-grid row g-3">
-            <div class="card col" aria-label="Grafik Target Tonase Mingguan">
-              <h2 style="font-size: 16px; font-weight: 700; margin: 0 0 8px">
-                Daily Production Trend (Last 30 Days)
-              </h2>
-              <canvas
-                id="dailyTrendChart"
-                width="400"
-                height="220"
-                role="img"
-                aria-label="Line chart produksi harian"
-              ></canvas>
+        <section id="dashboard-widgets" class="widgets-grid row g-3">
+          <div class="card col" aria-label="Grafik Target Tonase Mingguan">
+            <h2 style="font-size: 16px; font-weight: 700; margin: 0 0 8px">
+              Daily Production Trend (Last 30 Days)
+            </h2>
+            <canvas id="dailyTrendChart" width="400" height="220" role="img"
+              aria-label="Line chart produksi harian"></canvas>
+          </div>
+          <div class="card col" aria-label="Breakdown Produksi per Alat Berat">
+            <h2 style="font-size: 16px; font-weight: 700; margin: 0 0 8px">
+              Breakdown Produksi per Alat Berat (7 Hari)
+            </h2>
+            <canvas id="equipmentBreakdownChart" width="400" height="220" role="img"
+              aria-label="Bar chart produksi per alat"></canvas>
+            <div id="equipmentBreakdownLegend" class="legend" aria-label="Keterangan chart"></div>
+          </div>
+          <div class="card col" aria-live="polite" aria-label="Cuaca Terkini">
+            <h2 style="font-size: 16px; font-weight: 700; margin: 0 0 8px">
+              Cuaca Terkini
+            </h2>
+            <div id="weatherCard" style="display: flex; flex-direction: column; gap: 6px">
+              <div id="weatherSummary">Memuat cuaca...</div>
+              <div id="weatherMeta" style="font-size: 12px; color: #555"></div>
             </div>
-            <div
-              class="card col"
-              aria-label="Breakdown Produksi per Alat Berat"
-            >
-              <h2 style="font-size: 16px; font-weight: 700; margin: 0 0 8px">
-                Breakdown Produksi per Alat Berat (7 Hari)
-              </h2>
-              <canvas
-                id="equipmentBreakdownChart"
-                width="400"
-                height="220"
-                role="img"
-                aria-label="Bar chart produksi per alat"
-              ></canvas>
-              <div
-                id="equipmentBreakdownLegend"
-                class="legend"
-                aria-label="Keterangan chart"
-              ></div>
-            </div>
-            <div class="card col" aria-live="polite" aria-label="Cuaca Terkini">
-              <h2 style="font-size: 16px; font-weight: 700; margin: 0 0 8px">
-                Cuaca Terkini
-              </h2>
-              <div
-                id="weatherCard"
-                style="display: flex; flex-direction: column; gap: 6px"
-              >
-                <div id="weatherSummary">Memuat cuaca...</div>
-                <div
-                  id="weatherMeta"
-                  style="font-size: 12px; color: #555"
-                ></div>
-              </div>
-            </div>
-            <div class="card col" aria-label="Status Alat Berat Harian">
-              <h2 style="font-size: 16px; font-weight: 700; margin: 0 0 8px">
-                Status Alat Berat Harian
-              </h2>
-              <canvas
-                id="equipmentStatusChart"
-                width="400"
-                height="220"
-                role="img"
-                aria-label="Donut chart equipment status"
-              ></canvas>
-              <div
-                id="equipmentStatusLegend"
-                class="legend"
-                aria-label="Keterangan chart"
-              ></div>
-            </div>
-            <div class="card col-12" aria-label="Attendance & Shift Karyawan">
-              <h2 style="font-size: 16px; font-weight: 700; margin: 0 0 8px">
-                Attendance & Shift Karyawan (14 Hari)
-              </h2>
-              <canvas
-                id="attendanceStackedChart"
-                width="800"
-                height="220"
-                role="img"
-                aria-label="Stacked bar attendance"
-              ></canvas>
-              <div class="mt-3">
-                <table
-                  id="attendanceDetailTable"
-                  class="table"
-                  aria-label="Tabel attendance detail"
-                >
-                  <thead>
-                    <tr>
-                      <th>Nama</th>
-                      <th>Tanggal</th>
-                      <th>Status</th>
-                      <th>Keterangan</th>
-                    </tr>
-                  </thead>
-                  <tbody></tbody>
-                </table>
-              </div>
-            </div>
-            <div class="card col-12" aria-label="Jadwal Mingguan">
-              <h2 style="font-size: 16px; font-weight: 700; margin: 0 0 8px">
-                Jadwal Mingguan
-              </h2>
-              <table
-                id="weeklyScheduleTable"
-                class="table"
-                aria-label="Tabel jadwal mingguan"
-              >
+          </div>
+          <div class="card col" aria-label="Status Alat Berat Harian">
+            <h2 style="font-size: 16px; font-weight: 700; margin: 0 0 8px">
+              Status Alat Berat Harian
+            </h2>
+            <canvas id="equipmentStatusChart" width="400" height="220" role="img"
+              aria-label="Donut chart equipment status"></canvas>
+            <div id="equipmentStatusLegend" class="legend" aria-label="Keterangan chart"></div>
+          </div>
+          <div class="card col-12" aria-label="Attendance & Shift Karyawan">
+            <h2 style="font-size: 16px; font-weight: 700; margin: 0 0 8px">
+              Attendance & Shift Karyawan (14 Hari)
+            </h2>
+            <canvas id="attendanceStackedChart" width="800" height="220" role="img"
+              aria-label="Stacked bar attendance"></canvas>
+            <div class="mt-3">
+              <table id="attendanceDetailTable" class="table" aria-label="Tabel attendance detail">
                 <thead>
                   <tr>
-                    <th>Tanggal</th>
                     <th>Nama</th>
-                    <th>Kode Unit</th>
-                    <th>Shift</th>
-                    <th>Lokasi</th>
-                    <th>Catatan</th>
+                    <th>Tanggal</th>
+                    <th>Status</th>
+                    <th>Keterangan</th>
                   </tr>
                 </thead>
                 <tbody></tbody>
               </table>
-              <div class="d-flex justify-content-end gap-2">
-                <button
-                  class="btn btn-outline-secondary btn-sm"
-                  id="weeklyPrev"
-                >
-                  Prev
-                </button>
-                <button
-                  class="btn btn-outline-secondary btn-sm"
-                  id="weeklyNext"
-                >
-                  Next
-                </button>
-              </div>
             </div>
-          </section>
-        </main>
-      </div>
+          </div>
+          <div class="card col-12" aria-label="Jadwal Mingguan">
+            <h2 style="font-size: 16px; font-weight: 700; margin: 0 0 8px">
+              Jadwal Mingguan
+            </h2>
+            <table id="weeklyScheduleTable" class="table" aria-label="Tabel jadwal mingguan">
+              <thead>
+                <tr>
+                  <th>Tanggal</th>
+                  <th>Nama</th>
+                  <th>Kode Unit</th>
+                  <th>Shift</th>
+                  <th>Lokasi</th>
+                  <th>Catatan</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+            <div class="d-flex justify-content-end gap-2">
+              <button class="btn btn-outline-secondary btn-sm" id="weeklyPrev">
+                Prev
+              </button>
+              <button class="btn btn-outline-secondary btn-sm" id="weeklyNext">
+                Next
+              </button>
+            </div>
+          </div>
+        </section>
+      </main>
     </div>
+  </div>
 
-    <button
-      class="btn btn-primary rounded-circle shadow position-fixed bottom-0 end-0 m-3 floating-chat"
-      id="chatToggle"
-      aria-label="Buka Chatbot"
-    >
-      <i class="bi bi-chat-dots"></i>
-    </button>
+  <button class="btn btn-primary rounded-circle shadow position-fixed bottom-0 end-0 m-3 floating-chat" id="chatToggle"
+    aria-label="Buka Chatbot">
+    <i class="bi bi-chat-dots"></i>
+  </button>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script type="module" src="./dashboard.js"></script>
-    <script type="module" src="../../utils/logout.js"></script>
-    <script>
-      document
-        .getElementById("openChatMine")
-        ?.addEventListener("click", function (e) {
-          e.preventDefault();
-          document.getElementById("chatToggle")?.click();
-        });
-    </script>
-  </body>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script type="module" src="./dashboard.js"></script>
+  <script type="module" src="../../utils/logout.js"></script>
+  <script>
+    document
+      .getElementById("openChatMine")
+      ?.addEventListener("click", function (e) {
+        e.preventDefault();
+        document.getElementById("chatToggle")?.click();
+      });
+  </script>
+</body>
+
 </html>
->>>>>>> 9f98f19af362063e3803dee35572af4760ae119f

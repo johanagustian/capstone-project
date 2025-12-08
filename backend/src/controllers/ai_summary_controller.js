@@ -1,4 +1,4 @@
-import { getAllSumarry } from "../models/plan_optimization_log.js";
+import { getAllSumarry } from "../models/ai_summary_model.js";
 
 export const getSummary = async (req, res) => {
     try {
