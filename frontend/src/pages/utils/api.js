@@ -15,7 +15,7 @@ export async function postAuth(endpoint, data) {
   try {
     payload = await res.json();
   } catch (e) {
-    
+
   }
 
   if (!res.ok) {
@@ -35,10 +35,7 @@ const ENDPOINTS = {
 
   // Equipment
   EQUIPMENT_LIST: `${BASE_URL}/equipments`,
-  EQUIPMENT_DETAIL: (idEquipments) => `${BASE_URL}/equipments/${idEquipments}`
-
-  // 
-
+  EQUIPMENT_DETAIL: (idEquipments) => `${BASE_URL}/equipments/${idEquipments}`,
 
 
 }
@@ -47,7 +44,7 @@ export async function getCrewData() {
   const accessToken = getAccessToken();
 
   const fetchCrew = await fetch(ENDPOINTS.CREW_LIST, {
-    headers: { Authorization: `Bearer ${accessToken}`},
+    headers: { Authorization: `Bearer ${accessToken}` },
   });
 
   const json = await fetchCrew.json();
@@ -71,7 +68,7 @@ export async function deleteCrew(id) {
       const errorBody = await response.json().catch(() => ({}));
       throw new Error(
         errorBody.message ||
-          `Gagal menghapus ID ${id}. Status: ${response.status}`
+        `Gagal menghapus ID ${id}. Status: ${response.status}`
       );
     }
     return true;
@@ -79,4 +76,6 @@ export async function deleteCrew(id) {
     alert(error.message);
     return false;
   }
+
 }
+

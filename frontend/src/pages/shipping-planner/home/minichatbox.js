@@ -177,18 +177,3 @@ messageInput.addEventListener('keypress', (e) => {
         sendMessage();
     }
 });
-
-// Test connection on load (optional)
-window.addEventListener('load', async () => {
-    if (!N8N_CONFIG.webhookUrl.includes('your-n8n-instance.com')) {
-        try {
-            // Uncomment jika ingin test connection saat load
-            // await callN8NWebhook('test');
-            // statusDot.classList.remove('error');
-            console.log('N8N webhook configured');
-        } catch (error) {
-            console.warn('N8N connection test failed:', error);
-            statusDot.classList.add('error');
-        }
-    }
-});

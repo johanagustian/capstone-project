@@ -1,177 +1,138 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Mining Operations Dashboard</title>
-    <link rel="stylesheet" href="../../../style/mine-planner/style.css" />
-  </head>
-  <body>
-    <div class="dashboard-grid">
-      <aside class="sidebar">
-        <div class="profile-pic">
-          <img
-            src="../../../../public/assets/mine-planner-image/mine-planner-profile.png"
-            alt="profile"
-            class="menu-icon"
-          />
-        </div>
 
-        <h3 class="profile-name">Nino</h3>
-        <p class="profile-role">Mine Planner</p>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mining Operations Dashboard</title>
+  <link rel="stylesheet" href="../../../style/mine-planner/style.css" />
+</head>
 
-        <button class="btn-sidebar btn-primary">Akses Mine Hub</button>
-        <button class="btn-sidebar btn-secondary">Pengaturan Akun</button>
+<body>
+  <div class="dashboard-grid">
+    <aside class="sidebar">
+      <div class="profile-pic">
+        <img src="../../../../public/assets/mine-planner-image/mine-planner-profile.png" alt="profile"
+          class="menu-icon" />
+      </div>
 
-        <div class="logout-container">
-          <button class="btn-logout">Keluar (Logout)</button>
-        </div>
-      </aside>
+      <h3 class="profile-name">Nino</h3>
+      <p class="profile-role">Mine Planner</p>
 
-      <main class="main-content">
-        <h1
-          style="
+      <button class="btn-sidebar btn-primary">Akses Mine Hub</button>
+      <button class="btn-sidebar btn-secondary">Pengaturan Akun</button>
+
+      <div class="logout-container">
+        <button class="btn-logout">Keluar (Logout)</button>
+      </div>
+    </aside>
+
+    <main class="main-content">
+      <h1 style="
             font-size: 30px;
             font-weight: 700;
             margin-bottom: 32px;
             color: #1f2937;
-          "
-        >
-          Dashboard Mine Planner
-        </h1>
+          ">
+        Dashboard Mine Planner
+      </h1>
 
-        <section id="dashboard-widgets" class="widgets-grid">
-          <div class="card" aria-label="Grafik Target Tonase Mingguan">
-            <h2 style="font-size: 16px; font-weight: 700; margin: 0 0 8px">
-              Target Tonase Mingguan
-            </h2>
-            <canvas
-              id="tonnageChart"
-              width="400"
-              height="220"
-              role="img"
-              aria-label="Bar chart target tonase mingguan"
-            ></canvas>
-          </div>
-          <div class="card" aria-label="Ketersediaan Alat">
-            <h2 style="font-size: 16px; font-weight: 700; margin: 0 0 8px">
-              Ketersediaan Alat
-            </h2>
-            <canvas
-              id="availabilityChart"
-              width="400"
-              height="220"
-              role="img"
-              aria-label="Pie chart ketersediaan alat"
-            ></canvas>
-            <div
-              id="availabilityLegend"
-              class="legend"
-              aria-label="Keterangan pie chart"
-            ></div>
-          </div>
-          <div class="card" aria-live="polite" aria-label="Cuaca Terkini">
-            <h2 style="font-size: 16px; font-weight: 700; margin: 0 0 8px">
-              Cuaca Terkini
-            </h2>
-            <div
-              id="weatherCard"
-              style="display: flex; flex-direction: column; gap: 6px"
-            >
-              <div id="weatherSummary">Memuat cuaca...</div>
-              <div id="weatherMeta" style="font-size: 12px; color: #555"></div>
-            </div>
-          </div>
-          <div class="card" aria-label="Ringkasan Kru">
-            <h2 style="font-size: 16px; font-weight: 700; margin: 0 0 8px">
-              Ringkasan Kru
-            </h2>
-            <div
-              id="crewStats"
-              class="stats-row"
-              role="list"
-              aria-label="Statistik karyawan"
-            ></div>
-          </div>
-          <div class="card" aria-label="Weekly Plan">
-            <h2 style="font-size: 16px; font-weight: 700; margin: 0 0 8px">
-              Weekly Plan
-            </h2>
-            <table
-              id="weeklyPlanTable"
-              class="table"
-              aria-label="Tabel rencana mingguan"
-            >
-              <thead>
-                <tr>
-                  <th>Week</th>
-                  <th>Year</th>
-                  <th>Target Tonnage</th>
-                  <th>Calori</th>
-                  <th>Ash Max</th>
-                  <th>Mine</th>
-                  <th>Shipping</th>
-                </tr>
-              </thead>
-              <tbody></tbody>
-            </table>
-          </div>
-        </section>
-
-        <div class="menu-grid">
-          <a href="#" class="menu-card">
-            <img
-              src="../../../../public/assets/mine-planner-image/ai-recomendation-icon.png"
-              alt="AI Icon"
-              class="menu-icon"
-            />
-            <p class="menu-label">AI Optimasi</p>
-          </a>
-
-          <a href="../crew/crew_management_page.html" class="menu-card">
-            <img
-              src="../../../../public/assets/mine-planner-image/crew-icon.jfif"
-              alt="Karyawan Icon"
-              class="menu-icon"
-            />
-            <p class="menu-label">Manajemen Kru</p>
-          </a>
-
-          <a href="../equipment/equipment.html" class="menu-card">
-            <img
-              src="../../../../public/assets/mine-planner-image/equipment-icon.jfif"
-              alt="Alat Berat Icon"
-              class="menu-icon"
-            />
-            <p class="menu-label">Ketersediaan Alat</p>
-          </a>
-
-          <a href="../pit/pit.html" class="menu-card">
-            <img
-              src="../../../../public/assets/mine-planner-image/pit-icon.png"
-              alt="Pit Icon"
-              class="menu-icon"
-            />
-            <p class="menu-label">Status Pit</p>
-          </a>
-
-          <a
-            href="../target_production/target_production.html"
-            class="menu-card"
-          >
-            <img
-              src="../../../../public/assets/mine-planner-image/production-plan-icon.png"
-              alt="Production Icon"
-              class="menu-icon"
-            />
-            <p class="menu-label">Target Produksi</p>
-          </a>
+      <section id="dashboard-widgets" class="widgets-grid">
+        <div class="card" aria-label="Grafik Target Tonase Mingguan">
+          <h2 style="font-size: 16px; font-weight: 700; margin: 0 0 8px">
+            Target Tonase Mingguan
+          </h2>
+          <canvas id="tonnageChart" width="400" height="220" role="img"
+            aria-label="Bar chart target tonase mingguan"></canvas>
         </div>
-      </main>
+        <div class="card" aria-label="Ketersediaan Alat">
+          <h2 style="font-size: 16px; font-weight: 700; margin: 0 0 8px">
+            Ketersediaan Alat
+          </h2>
+          <canvas id="availabilityChart" width="400" height="220" role="img"
+            aria-label="Pie chart ketersediaan alat"></canvas>
+          <div id="availabilityLegend" class="legend" aria-label="Keterangan pie chart"></div>
+        </div>
+        <div class="card" aria-live="polite" aria-label="Cuaca Terkini">
+          <h2 style="font-size: 16px; font-weight: 700; margin: 0 0 8px">
+            Cuaca Terkini
+          </h2>
+          <div id="weatherCard" style="display: flex; flex-direction: column; gap: 6px">
+            <div id="weatherSummary">Memuat cuaca...</div>
+            <div id="weatherMeta" style="font-size: 12px; color: #555"></div>
+          </div>
+        </div>
+        <div class="card" aria-label="Ringkasan Kru">
+          <h2 style="font-size: 16px; font-weight: 700; margin: 0 0 8px">
+            Ringkasan Kru
+          </h2>
+          <div id="crewStats" class="stats-row" role="list" aria-label="Statistik karyawan"></div>
+        </div>
+        <div class="card" aria-label="Weekly Plan">
+          <h2 style="font-size: 16px; font-weight: 700; margin: 0 0 8px">
+            Weekly Plan
+          </h2>
+          <table id="weeklyPlanTable" class="table" aria-label="Tabel rencana mingguan">
+            <thead>
+              <tr>
+                <th>Week</th>
+                <th>Year</th>
+                <th>Target Tonnage</th>
+                <th>Calori</th>
+                <th>Ash Max</th>
+                <th>Mine</th>
+                <th>Shipping</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </section>
 
-      <div class="floating-chat">Chatbot AI</div>
-    </div>
 
-    <script type="module" src="./dashboard.js"></script>
-  </body>
+
+      <div class="menu-grid">
+        <a href="../mine_plan/mine_plan.html" class="menu-card">
+          <img src="../../../../public/assets/mine-planner-image/production-plan-icon.png" alt="Production Icon"
+            class="menu-icon" />
+          <p class="menu-label">Create Plan</p>
+        </a>
+
+        <a href="#" class="menu-card">
+          <img src="../../../../public/assets/mine-planner-image/ai-recomendation-icon.png" alt="AI Icon"
+            class="menu-icon" />
+          <p class="menu-label">AI Optimasi</p>
+        </a>
+
+        <a href="../crew/crew_management_page.html" class="menu-card">
+          <img src="../../../../public/assets/mine-planner-image/crew-icon.jfif" alt="Karyawan Icon"
+            class="menu-icon" />
+          <p class="menu-label">Manajemen Kru</p>
+        </a>
+
+        <a href="../equipment/equipment.html" class="menu-card">
+          <img src="../../../../public/assets/mine-planner-image/equipment-icon.jfif" alt="Alat Berat Icon"
+            class="menu-icon" />
+          <p class="menu-label">Ketersediaan Alat</p>
+        </a>
+
+        <a href="../pit/pit.html" class="menu-card">
+          <img src="../../../../public/assets/mine-planner-image/pit-icon.png" alt="Pit Icon" class="menu-icon" />
+          <p class="menu-label">Status Pit</p>
+        </a>
+
+        <a href="../target_production/target_production.html" class="menu-card">
+          <img src="../../../../public/assets/mine-planner-image/production-plan-icon.png" alt="Production Icon"
+            class="menu-icon" />
+          <p class="menu-label">Target Produksi</p>
+        </a>
+      </div>
+    </main>
+
+    <div class="floating-chat">Chatbot AI</div>
+  </div>
+
+  <script type="module" src="./dashboard.js"></script>
+</body>
+
 </html>

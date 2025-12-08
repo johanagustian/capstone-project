@@ -4,11 +4,409 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Shipping Schedule Management</title>
+    <link rel="stylesheet" href="../../../style/ship-planner/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .header h1 {
+            color: #2c3e50;
+            margin: 0;
+            font-size: 2.5em;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background-color: #3498db;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #2980b9;
+        }
+
+        .btn-secondary {
+            background-color: #95a5a6;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background-color: #7f8c8d;
+        }
+
+        .btn-success {
+            background-color: #27ae60;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background-color: #229954;
+        }
+
+        .btn-danger {
+            background-color: #e74c3c;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background-color: #c0392b;
+        }
+
+        .form-section,
+        .report-section {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
+
+        .section-header {
+            background-color: #f8f9fa;
+            padding: 15px 20px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .section-header h2 {
+            margin: 0;
+            color: #2c3e50;
+            font-size: 1.5em;
+        }
+
+        .form-content {
+            padding: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #34495e;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 20px;
+        }
+
+        .form-row .form-group {
+            flex: 1;
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+        }
+
+        .schedule-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 0;
+        }
+
+        .schedule-table th,
+        .schedule-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .schedule-table th {
+            background-color: #f8f9fa;
+            font-weight: bold;
+            color: #2c3e50;
+            position: sticky;
+            top: 0;
+        }
+
+        .schedule-table tbody tr:hover {
+            background-color: #f8f9fa;
+        }
+
+        .status-badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .status-scheduled {
+            background-color: #3498db;
+            color: white;
+        }
+
+        .status-loading {
+            background-color: #f39c12;
+            color: white;
+        }
+
+        .status-departed {
+            background-color: #27ae60;
+            color: white;
+        }
+
+        .status-arrived {
+            background-color: #9b59b6;
+            color: white;
+        }
+
+        .status-cancelled {
+            background-color: #e74c3c;
+            color: white;
+        }
+
+        .actions {
+            display: flex;
+            gap: 5px;
+        }
+
+        .btn-sm {
+            padding: 5px 10px;
+            font-size: 12px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 20px;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 80%;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .modal-header h2 {
+            margin: 0;
+        }
+
+        .close {
+            font-size: 28px;
+            cursor: pointer;
+            color: #aaa;
+        }
+
+        .close:hover {
+            color: #000;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .error-message {
+            background-color: #f8d7da;
+            color: #721c24;
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+        }
+
+        .success-message {
+            background-color: #d4edda;
+            color: #155724;
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+        }
+
+        @media (max-width: 768px) {
+            .form-row {
+                flex-direction: column;
+            }
+
+            .header {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+        }
+    </style>
 </head>
 
 <body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-ship"></i> Shipping Schedule Management</h1>
+            <button class="btn btn-primary" onclick="showCreateForm()">
+                <i class="fas fa-plus"></i> Create New Schedule
+            </button>
+        </div>
 
+        <!-- Create/Edit Form Modal -->
+        <div id="scheduleModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 id="modalTitle">Create New Shipping Schedule</h2>
+                    <span class="close" onclick="closeModal()">&times;</span>
+                </div>
+                <form id="scheduleForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="vesselName">Vessel Name *</label>
+                            <input type="text" id="vesselName" name="vessel_name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="cargoType">Cargo Type *</label>
+                            <select id="cargoType" name="cargo_type" required>
+                                <option value="">Select Cargo Type</option>
+                                <option value="Coal">Coal</option>
+                                <option value="Iron Ore">Iron Ore</option>
+                                <option value="Copper">Copper</option>
+                                <option value="Gold">Gold</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="departureDate">Departure Date *</label>
+                            <input type="date" id="departureDate" name="departure_date" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="departureTime">Departure Time</label>
+                            <input type="time" id="departureTime" name="departure_time">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="destinationPort">Destination Port *</label>
+                            <input type="text" id="destinationPort" name="destination_port" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="tonnage">Tonnage (MT) *</label>
+                            <input type="number" id="tonnage" name="tonnage" step="0.01" min="0" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="status">Status</label>
+                        <select id="status" name="status">
+                            <option value="Scheduled">Scheduled</option>
+                            <option value="Loading">Loading</option>
+                            <option value="Departed">Departed</option>
+                            <option value="Arrived">Arrived</option>
+                            <option value="Cancelled">Cancelled</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="notes">Notes</label>
+                        <textarea id="notes" name="notes"
+                            placeholder="Additional notes or special instructions"></textarea>
+                    </div>
+
+                    <div class="form-actions" style="text-align: right; margin-top: 20px;">
+                        <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                        <button type="submit" class="btn btn-success" id="submitBtn">
+                            <i class="fas fa-save"></i> Save Schedule
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Schedules Report Table -->
+        <div class="report-section">
+            <div class="section-header">
+                <h2><i class="fas fa-table"></i> Shipping Schedules Report</h2>
+            </div>
+            <div id="loadingIndicator" class="loading" style="display: none;">
+                <i class="fas fa-spinner fa-spin"></i> Loading schedules...
+            </div>
+            <div id="errorMessage" class="error-message" style="display: none;"></div>
+            <div id="successMessage" class="success-message" style="display: none;"></div>
+            <div class="table-responsive">
+                <table class="schedule-table" id="schedulesTable">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Vessel Name</th>
+                            <th>Departure Date</th>
+                            <th>Time</th>
+                            <th>Destination</th>
+                            <th>Cargo Type</th>
+                            <th>Tonnage (MT)</th>
+                            <th>Status</th>
+                            <th>Notes</th>
+                            <th>Created</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="schedulesTableBody">
+                        <!-- Data will be populated by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script src="../../../src/pages/utils/api.js"></script>
+    <script src="shipping_schedule.js"></script>
 </body>
 
 </html>

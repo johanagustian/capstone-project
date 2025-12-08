@@ -6,7 +6,7 @@ import crewRoutes from "./routes/crew_route.js";
 import equipmentRoutes from "./routes/equipment_routes.js";
 import maintenanceScheduleRoutes from "./routes/maintenance_schedule_route.js";
 import pitRoutes from "./routes/pit_route.js";
-import blendingPlanRoutes from "./routes/blending_plan_route.js";
+import plannerRoutes from "./routes/planner_route.js";
 
 const PORT = process.env.PORT || 3000;
 const app = express();
@@ -35,7 +35,7 @@ app.use(
       }
       return cb(new Error("Not allowed by CORS"));
     },
-    methods: ["GET", "POST", "PUT", "DELETE"],
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
     credentials: true,
   })
 );
@@ -61,8 +61,9 @@ app.use("/maintenance-schedules", maintenanceScheduleRoutes);
 // API pit
 app.use("/pits", pitRoutes);
 
-// API blending-plan
-app.use("/blending-plans", blendingPlanRoutes);
+// API palnner
+app.use("/planner", plannerRoutes);
+
 
 app.use((err, req, res, next) => {
   const status = err.status || 500;
