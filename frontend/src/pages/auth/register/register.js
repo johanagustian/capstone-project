@@ -15,19 +15,18 @@ const updatePageTitle = () => {
       roleParam === "shipper_planner"
         ? "Shipper Planner"
         : roleParam === "mining_planner"
-        ? "Mining Planner"
-        : "Planner";
+          ? "Mining Planner"
+          : "Planner";
     const roleIcon =
       roleParam === "shipper_planner"
         ? "/assets/Port.png"
         : roleParam === "mining_planner"
-        ? "/assets/Oil Pump.png"
-        : "";
-    pageTitle.innerHTML = `${
-      roleIcon
-        ? `<img class="title-icon" src="${roleIcon}" alt="${roleTitle} icon" />`
-        : ""
-    }<span>Register ${roleTitle}</span>`;
+          ? "/assets/Oil Pump.png"
+          : "";
+    pageTitle.innerHTML = `${roleIcon
+      ? ``
+      : ""
+      }<span>Register ${roleTitle}</span>`;
   }
 };
 updatePageTitle();
@@ -80,6 +79,10 @@ if (registerForm) {
         "Pendaftaran berhasil! Silakan login.",
         "success"
       );
+
+      setTimeout(() => {
+        window.location.href = `/src/pages/auth/login/login.html?role=${encodeURIComponent(roleParam)}`;
+      }, 1200);
 
       registerForm.reset();
     } catch (err) {

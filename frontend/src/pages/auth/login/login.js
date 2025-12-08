@@ -17,19 +17,18 @@ const updatePageTitle = () => {
       roleParam === "shipper_planner"
         ? "Shipper Planner"
         : roleParam === "mining_planner"
-        ? "Mining Planner"
-        : "Planner";
+          ? "Mining Planner"
+          : "Planner";
     const roleIcon =
       roleParam === "shipper_planner"
         ? "/assets/Port.png"
         : roleParam === "mining_planner"
-        ? "/assets/Oil Pump.png"
-        : "";
-    pageTitle.innerHTML = `${
-      roleIcon
-        ? `<img class="title-icon" src="${roleIcon}" alt="${roleTitle} icon" />`
+          ? "/assets/Oil Pump.png"
+          : "";
+    pageTitle.innerHTML = `${roleIcon
+        ? ``
         : ""
-    }<span>Login ${roleTitle}</span>`;
+      }<span>Login ${roleTitle}</span>`;
   }
 };
 
@@ -83,7 +82,7 @@ if (loginForm) {
         localStorage.setItem("authUser", JSON.stringify(data?.user || {}));
         try {
           localStorage.setItem(ROLE_ID_KEY, String(roleId));
-        } catch {}
+        } catch { }
 
         setMessage(loginMsg, "Login berhasil! Mengalihkan...", "success");
 
