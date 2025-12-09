@@ -1,0 +1,181 @@
+.sidebar {
+  min-height: 100vh;
+  background: linear-gradient(180deg, #2c3e50 0%, #34495e 100%);
+  color: white;
+}
+.sidebar .nav-link {
+  color: #ecf0f1;
+  padding: 0.8rem 1rem;
+  margin: 0.2rem 0;
+  border-radius: 0.5rem;
+  transition: all 0.3s;
+}
+.sidebar .nav-link:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+}
+.sidebar .nav-link.active {
+  background: #3498db;
+  color: white;
+}
+.content-wrapper {
+  background-color: #f8f9fa;
+}
+.card-stat {
+  border: none;
+  border-radius: 10px;
+  transition: transform 0.3s;
+}
+.card-stat:hover {
+  transform: translateY(-5px);
+}
+.table-actions {
+  white-space: nowrap;
+}
+.progress-bar-custom {
+  height: 10px;
+  border-radius: 5px;
+}
+.tonnage-badge {
+  background-color: #e3f2fd;
+  color: #1565c0;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  font-weight: 600;
+}
+.summary-card {
+  border-left: 4px solid;
+  padding-left: 1rem;
+}
+.summary-card.tonnage {
+  border-left-color: #4caf50;
+}
+.summary-card.attendance {
+  border-left-color: #2196f3;
+}
+.summary-card.equipment {
+  border-left-color: #ff9800;
+}
+
+.status-badge {
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+.status-active {
+  background-color: #d1fae5;
+  color: #065f46;
+}
+.status-inactive {
+  background-color: #f3f4f6;
+  color: #6b7280;
+}
+.avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  color: white;
+}
+.avatar-primary {
+  background-color: #3b82f6;
+}
+.avatar-success {
+  background-color: #10b981;
+}
+.avatar-warning {
+  background-color: #f59e0b;
+}
+.avatar-danger {
+  background-color: #ef4444;
+}
+
+.status-ready {
+  background-color: #d1fae5;
+  color: #065f46;
+}
+.status-standby {
+  background-color: #fef3c7;
+  color: #92400e;
+}
+.status-maintenance {
+  background-color: #fee2e2;
+  color: #991b1b;
+}
+
+.badge-shift {
+  background-color: #e3f2fd;
+  color: #1565c0;
+}
+.badge-location {
+  background-color: #e8f5e9;
+  color: #2e7d32;
+}
+
+.badge-present {
+  background-color: #d1fae5;
+  color: #065f46;
+}
+.badge-sick {
+  background-color: #fef3c7;
+  color: #92400e;
+}
+.badge-permission {
+  background-color: #e0e7ff;
+  color: #3730a3;
+}
+.badge-absent {
+  background-color: #fee2e2;
+  color: #991b1b;
+}
+.badge-leave {
+  background-color: #f3e8ff;
+  color: #6b21a8;
+}
+.badge-scheduled {
+  background-color: #dbeafe;
+  color: #1e40af;
+}
+.badge-not-scheduled {
+  background-color: #f1f5f9;
+  color: #64748b;
+}
+.attendance-row:hover {
+  background-color: #f8f9fa;
+}
+
+.filter-card {
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+.location-badge {
+  background-color: #e0f2fe;
+  color: #0369a1;
+  font-size: 0.7rem;
+  padding: 0.2rem 0.4rem;
+  border-radius: 0.2rem;
+}
+.equipment-card {
+  cursor: pointer;
+  transition: all 0.3s;
+}
+.equipment-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+.status-duration {
+  font-size: 0.75rem;
+  color: #6c757d;
+}
+.tab-content {
+  padding-top: 20px;
+}
+.nav-tabs .nav-link.active {
+  border-bottom: 3px solid #0d6efd;
+  font-weight: 600;
+}
