@@ -71,6 +71,7 @@ ENDPOINTS.DAILY_REPORT_CURRENT_PERIOD = `${BASE_URL}/daily-reports/current-perio
 // DAILY ATTENDANCE API
 ENDPOINTS.DAILY_ATTENDANCE = `${BASE_URL}/daily-attendance`;
 ENDPOINTS.DAILY_ATTENDANCE_SUMMARY = `${BASE_URL}/daily-attendance/summary`;
+ENDPOINTS.DAILY_ATTENDANCE = `${BASE_URL}/daily-attendance`;
 
 
 export async function getCrewData() {
@@ -814,38 +815,6 @@ export async function getWeeklyPeriodDetail(id) {
 }
 
 /**
- * Mengambil data kehadiran untuk tanggal tertentu
- */
-export async function getDailyAttendance(date) {
-  const accessToken = getAccessToken();
-  const res = await fetch(`${ENDPOINTS.DAILY_ATTENDANCE}?date=${date}`, {
-    headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : {},
-  });
-  const json = await res.json().catch(() => ({}));
-  return {
-    ...json,
-    ok: res.ok,
-    status: res.status,
-  };
-}
-
-/**
- * Mengambil ringkasan kehadiran untuk tanggal tertentu
- */
-export async function getDailyAttendanceSummary(date) {
-  const accessToken = getAccessToken();
-  const res = await fetch(`${ENDPOINTS.DAILY_ATTENDANCE_SUMMARY}?date=${date}`, {
-    headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : {},
-  });
-  const json = await res.json().catch(() => ({}));
-  return {
-    ...json,
-    ok: res.ok,
-    status: res.status,
-  };
-}
-
-/**
  * Batch update kehadiran
  */
 export async function batchUpdateDailyAttendance(date, attendanceList) {
@@ -867,20 +836,43 @@ export async function batchUpdateDailyAttendance(date, attendanceList) {
  * Update kehadiran untuk karyawan tertentu
  */
 export async function updateAttendance(date, employeeId, attendanceData) {
-  const accessToken = getAccessToken();
-  const res = await fetch(`${ENDPOINTS.DAILY_ATTENDANCE}/${date}/${employeeId}`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      ...(accessToken && { Authorization: `Bearer ${accessToken}` }),
-    },
-    body: JSON.stringify(attendanceData),
-  });
-  const json = await res.json().catch(() => ({}));
-  if (!res.ok) throw new Error(json.message || "Failed to update attendance");
-  return json;
+  try {
+    const accessToken = getAccessToken();
+    console.log("Updating attendance:", { date, employeeId, attendanceData });
+    
+    const res = await fetch(`${ENDPOINTS.DAILY_ATTENDANCE}/${date}/${employeeId}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        ...(accessToken && { Authorization: `Bearer ${accessToken}` }),
+      },
+      body: JSON.stringify(attendanceData),
+    });
+    
+    console.log("Response status:", res.status);
+    
+    const text = await res.text();
+    console.log("Response text:", text);
+    
+    let json;
+    try {
+      json = JSON.parse(text);
+    } catch (e) {
+      console.error("Failed to parse JSON:", e);
+      throw new Error("Invalid response from server");
+    }
+    
+    if (!res.ok) {
+      console.error("Server error response:", json);
+      throw new Error(json.message || json.serverMessage || `Failed to update attendance (${res.status})`);
+    }
+    
+    return json;
+  } catch (error) {
+    console.error("API Error updateAttendance:", error);
+    throw error;
+  }
 }
-
 /**
  * Mengambil data karyawan untuk dropdown
  */
@@ -897,3 +889,46 @@ export async function getAllActiveEmployees() {
   };
 }
 
+/**
+ * Get daily attendance for a date
+ */
+export async function getDailyAttendance(date) {
+  try {
+    const accessToken = getAccessToken();
+    const res = await fetch(`${ENDPOINTS.DAILY_ATTENDANCE}?date=${date}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        ...(accessToken && { Authorization: `Bearer ${accessToken}` }),
+      },
+    });
+    
+    const json = await res.json();
+    
+    if (!res.ok) {
+      throw new Error(json.message || "Failed to get daily attendance");
+    }
+    
+    return json; // json sudah mengandung { message, data }
+  } catch (error) {
+    console.error("API Error getDailyAttendance:", error);
+    throw error;
+  }
+}
+
+/**
+ * Get daily attendance summary
+ */
+export async function getDailyAttendanceSummary(date) {
+  const accessToken = getAccessToken();
+  const res = await fetch(`${ENDPOINTS.DAILY_ATTENDANCE}/summary?date=${date}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      ...(accessToken && { Authorization: `Bearer ${accessToken}` }),
+    },
+  });
+  const json = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(json.message || "Failed to get attendance summary");
+  return json;
+}

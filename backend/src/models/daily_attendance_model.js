@@ -1,30 +1,6 @@
 import { pool as dbPool } from "../config/database.js";
 
-// Parse notes dari weekly_schedule untuk menentukan status default
-function parseAttendanceStatusFromNotes(notes) {
-  if (!notes) return "present";
-
-  const lowerNotes = notes.toLowerCase();
-
-  if (lowerNotes.includes("sick") || lowerNotes.includes("sakit")) {
-    return "sick";
-  } else if (lowerNotes.includes("permission") || lowerNotes.includes("izin")) {
-    return "permission";
-  } else if (
-    lowerNotes.includes("absent") ||
-    lowerNotes.includes("tidak hadir")
-  ) {
-    return "absent";
-  } else if (lowerNotes.includes("leave") || lowerNotes.includes("cuti")) {
-    return "leave";
-  } else if (lowerNotes.includes("off duty") || lowerNotes.includes("off")) {
-    return "leave"; // off duty dianggap sebagai cuti
-  } else {
-    return "present";
-  }
-}
-
-// Get all attendance data for date - HANYA dari weekly_schedule
+// Get all attendance data for date
 export const getAllAttendanceData = async (date) => {
   try {
     // 1. Ambil SEMUA karyawan yang dijadwalkan di weekly_schedule untuk tanggal ini
@@ -47,12 +23,12 @@ export const getAllAttendanceData = async (date) => {
         he.unit_code as equipment_code,
         he.equipment_type
       FROM weekly_schedule ws
-      INNER JOIN employees e ON ws.employee_id = e.employee_id
+      LEFT JOIN employees e ON ws.employee_id = e.employee_id
       LEFT JOIN shifts s ON ws.shift_id = s.shift_id
       LEFT JOIN locations l ON ws.location_id = l.location_id
       LEFT JOIN heavy_equipment he ON ws.equipment_id = he.equipment_id
-      WHERE ws.date = ? AND e.status = 'active'
-      ORDER BY e.name`,
+      WHERE ws.date = ?
+      ORDER BY COALESCE(e.name, 'Unknown')`,
       [date]
     );
 
@@ -86,28 +62,23 @@ export const getAllAttendanceData = async (date) => {
     const attendanceList = scheduledData.map((scheduled) => {
       const existing = attendanceMap.get(scheduled.employee_id);
 
-      // Tentukan status default dari schedule_notes
-      const defaultStatus = parseAttendanceStatusFromNotes(
-        scheduled.schedule_notes
-      );
-
-      // Jika sudah ada di daily_attendance, gunakan status dari sana (karena sudah diedit)
-      // Jika belum, gunakan status default dari schedule notes
+      // Jika sudah ada catatan di daily_attendance, gunakan status dari sana
       if (existing) {
         return {
           ...scheduled,
           attendance_id: existing.attendance_id,
           attendance_status: existing.attendance_status,
           remarks: existing.remarks || scheduled.schedule_notes,
-          is_edited: true, // Flag bahwa sudah diedit
+          is_edited: true,
         };
       } else {
+        // Default: semua yang dijadwalkan dianggap hadir
         return {
           ...scheduled,
           attendance_id: null,
-          attendance_status: defaultStatus, // Default dari schedule notes
+          attendance_status: "present", // SEMUA default present
           remarks: scheduled.schedule_notes || "",
-          is_edited: false, // Belum diedit
+          is_edited: false,
         };
       }
     });
@@ -126,14 +97,22 @@ export const getAllAttendanceData = async (date) => {
 // Get attendance summary
 export const getAttendanceSummary = async (date) => {
   try {
-    // Ambil data attendance untuk tanggal ini
     const data = await getAllAttendanceData(date);
 
-    // Hitung summary dari data yang ditampilkan (baik yang sudah ada di daily_attendance maupun default)
-    const summary = {};
+    // Hitung summary
+    const summary = {
+      present: 0,
+      sick: 0,
+      permission: 0,
+      absent: 0,
+      leave: 0,
+    };
+
     data.attendance.forEach((item) => {
       const status = item.attendance_status;
-      summary[status] = (summary[status] || 0) + 1;
+      if (summary[status] !== undefined) {
+        summary[status]++;
+      }
     });
 
     // Convert ke array format
@@ -159,14 +138,18 @@ export const upsertDailyAttendance = async (
   employeeId,
   attendanceData
 ) => {
+  const connection = await dbPool.getConnection();
   try {
+    await connection.beginTransaction();
+
     // Check if attendance already exists
-    const [existing] = await dbPool.execute(
+    const [existing] = await connection.execute(
       `SELECT attendance_id FROM daily_attendance 
        WHERE date = ? AND employee_id = ?`,
       [date, employeeId]
     );
 
+    let result;
     if (existing.length > 0) {
       // Update existing
       const SQLQuery = `
@@ -174,12 +157,12 @@ export const upsertDailyAttendance = async (
         SET attendance_status = ?, remarks = ?, created_at = NOW()
         WHERE attendance_id = ?
       `;
-      const [result] = await dbPool.execute(SQLQuery, [
+      const [updateResult] = await connection.execute(SQLQuery, [
         attendanceData.attendance_status,
         attendanceData.remarks || null,
         existing[0].attendance_id,
       ]);
-      return { updated: true, attendance_id: existing[0].attendance_id };
+      result = { updated: true, attendance_id: existing[0].attendance_id };
     } else {
       // Create new
       const SQLQuery = `
@@ -187,17 +170,23 @@ export const upsertDailyAttendance = async (
         (date, employee_id, attendance_status, remarks, created_at)
         VALUES (?, ?, ?, ?, NOW())
       `;
-      const [result] = await dbPool.execute(SQLQuery, [
+      const [insertResult] = await connection.execute(SQLQuery, [
         date,
         employeeId,
         attendanceData.attendance_status,
         attendanceData.remarks || null,
       ]);
-      return { updated: false, attendance_id: result.insertId };
+      result = { updated: false, attendance_id: insertResult.insertId };
     }
+
+    await connection.commit();
+    return result;
   } catch (error) {
+    await connection.rollback();
     console.error("Error in upsertDailyAttendance:", error);
     throw error;
+  } finally {
+    connection.release();
   }
 };
 

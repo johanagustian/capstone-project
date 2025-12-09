@@ -70,7 +70,7 @@ app.use("/api/weekly-periods", weeklyPeriodsRoutes);
 app.use("/weekly-schedules", weeklyScheduleRoutes);
 
 // API daily-attendance
-app.use("daily-attendance", dailyAttendanceRoutes);
+app.use("/daily-attendance", dailyAttendanceRoutes);
 
 // API ai_summary
 app.use("/ai_summary", aiSummaryRoutes);

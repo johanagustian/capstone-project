@@ -1,52 +1,20 @@
-import {
-  getDailyAttendance,
-  getDailyAttendanceSummary,
-  batchUpdateDailyAttendance,
-  updateAttendance,
-  getAllActiveEmployees,
-  getAllEmployees,
-} from "../../utils/api.js";
+import { getDailyAttendance, updateAttendance } from "../../utils/api.js";
 
-const API_BASE_URL = "http://localhost:3000/api";
-let attendanceData = {
-  attendance: [],
-  scheduled: [],
-  otherEmployees: [],
-};
+let attendanceData = [];
 let currentDate = null;
 
 // Initialize date pickers
 function initializeDatePickers() {
   const dateSelector = document.getElementById("date-selector");
   if (dateSelector) {
-
     const today = new Date().toISOString().split("T")[0];
     dateSelector.value = today;
     currentDate = today;
-    
-    dateSelector.addEventListener("change", function() {
+
+    dateSelector.addEventListener("change", function () {
       currentDate = this.value;
       loadDailyAttendance();
     });
-  }
-}
-
-// Format date
-function formatDate(dateString) {
-  if (!dateString) return "-";
-  try {
-    const date = new Date(dateString);
-    if (isNaN(date.getTime())) return "-";
-    
-    return date.toLocaleDateString("id-ID", {
-      weekday: "short",
-      day: "numeric",
-      month: "short",
-      year: "numeric",
-    });
-  } catch (error) {
-    console.error("Error formatting date:", error);
-    return "-";
   }
 }
 
@@ -67,9 +35,8 @@ function showToast(type, title, message) {
   document.body.insertAdjacentHTML("beforeend", toastHtml);
   const toast = new bootstrap.Toast(document.querySelector(".toast"));
   toast.show();
-  
-  // Remove toast after hidden
-  toast._element.addEventListener("hidden.bs.toast", function() {
+
+  toast._element.addEventListener("hidden.bs.toast", function () {
     this.remove();
   });
 }
@@ -90,23 +57,46 @@ function updateTime() {
 
 // Get status badge class
 function getStatusBadgeClass(status) {
-  switch(status) {
-    case 'present': return 'badge-present';
-    case 'sick': return 'badge-sick';
-    case 'permission': return 'badge-permission';
-    case 'absent': return 'badge-absent';
-    case 'leave': return 'badge-leave';
-    default: return 'bg-secondary';
+  switch (status) {
+    case "present":
+      return "badge bg-success";
+    case "sick":
+      return "badge bg-warning";
+    case "permission":
+      return "badge bg-info";
+    case "absent":
+      return "badge bg-danger";
+    case "leave":
+      return "badge bg-secondary";
+    default:
+      return "badge bg-secondary";
   }
 }
 
-// Get schedule status badge class
-function getScheduleBadgeClass(status) {
-  switch(status) {
-    case 'Scheduled': return 'badge-scheduled';
-    case 'Not Scheduled': return 'badge-not-scheduled';
-    default: return 'bg-secondary';
+// Get status display text
+function getStatusText(status) {
+  switch (status) {
+    case "present":
+      return "Hadir";
+    case "sick":
+      return "Sakit";
+    case "permission":
+      return "Izin";
+    case "absent":
+      return "Absen";
+    case "leave":
+      return "Cuti";
+    default:
+      return status;
   }
+}
+
+// Escape HTML untuk mencegah XSS
+function escapeHtml(text) {
+  if (!text) return "";
+  const div = document.createElement("div");
+  div.textContent = text;
+  return div.innerHTML;
 }
 
 // Load daily attendance
@@ -121,445 +111,275 @@ async function loadDailyAttendance() {
     showLoading(true);
 
     const response = await getDailyAttendance(currentDate);
-    
-    if (!response.ok) {
-      throw new Error(response.message || "Failed to load attendance data");
+
+    // Jika response berisi error
+    if (response.message && response.message.includes("Error")) {
+      throw new Error(response.message);
     }
 
     const data = response.data;
-    attendanceData = data;
+    attendanceData = data.attendance || [];
 
     updateAttendanceStats(data);
+    renderAttendanceTable();
 
-    renderAttendanceTables(data);
-    
+    showLoading(false);
   } catch (error) {
     console.error("Error loading daily attendance:", error);
-    showToast("danger", "Error", error.message || "Failed to load attendance data");
-    
+    showToast(
+      "danger",
+      "Error",
+      error.message || "Failed to load attendance data"
+    );
     showLoading(false, true);
   }
 }
 
 // Show loading state
 function showLoading(isLoading, isError = false) {
-  const tbody1 = document.getElementById("recorded-attendance-body");
-  const tbody2 = document.getElementById("scheduled-attendance-body");
-  const tbody3 = document.getElementById("other-attendance-body");
-  
-  const loadingHTML = `
-    <tr>
-      <td colspan="7" class="text-center py-5">
-        <div class="spinner-border text-primary" role="status">
-          <span class="visually-hidden">Loading...</span>
-        </div>
-        <p class="mt-2 text-muted">Loading attendance data...</p>
-      </td>
-    </tr>
-  `;
-  
-  const errorHTML = `
-    <tr>
-      <td colspan="7" class="text-center py-5">
-        <i class="bi bi-exclamation-triangle text-danger fs-1"></i>
-        <p class="mt-2 text-danger">Failed to load data</p>
-        <button class="btn btn-sm btn-primary mt-2" onclick="loadDailyAttendance()">
-          <i class="bi bi-arrow-clockwise me-1"></i> Try Again
-        </button>
-      </td>
-    </tr>
-  `;
-  
-  if (tbody1) tbody1.innerHTML = isError ? errorHTML : (isLoading ? loadingHTML : "");
-  if (tbody2) tbody2.innerHTML = isError ? errorHTML : (isLoading ? loadingHTML : "");
-  if (tbody3) tbody3.innerHTML = isError ? errorHTML : (isLoading ? loadingHTML : "");
+  const tbody = document.getElementById("recorded-attendance-body");
+
+  if (!tbody) return;
+
+  if (isLoading) {
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="7" class="text-center py-5">
+          <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+          </div>
+          <p class="mt-2 text-muted">Loading attendance data...</p>
+        </td>
+      </tr>
+    `;
+  } else if (isError) {
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="7" class="text-center py-5">
+          <i class="bi bi-exclamation-triangle text-danger fs-1"></i>
+          <p class="mt-2 text-danger">Failed to load data</p>
+          <button class="btn btn-sm btn-primary mt-2" onclick="window.location.reload()">
+            <i class="bi bi-arrow-clockwise me-1"></i> Try Again
+          </button>
+        </td>
+      </tr>
+    `;
+  }
 }
 
 // Update attendance statistics
 function updateAttendanceStats(data) {
   const summary = data.summary || [];
   const totalScheduled = data.total_scheduled || 0;
-  
+
   let presentCount = 0;
   let totalCount = 0;
-  
-  summary.forEach(item => {
+
+  summary.forEach((item) => {
     totalCount += item.count || 0;
-    if (item.attendance_status === 'present') {
+    if (item.attendance_status === "present") {
       presentCount = item.count || 0;
     }
   });
-  
-  document.getElementById("total-employees").textContent = totalScheduled;
-  document.getElementById("present-count").textContent = presentCount;
-  document.getElementById("scheduled-count").textContent = totalScheduled;
-  
+
+  // Update UI elements
+  const totalEmployeesEl = document.getElementById("total-employees");
+  const presentCountEl = document.getElementById("present-count");
+  const scheduledCountEl = document.getElementById("scheduled-count");
+  const attendanceRateEl = document.getElementById("attendance-rate");
+
+  if (totalEmployeesEl) totalEmployeesEl.textContent = totalScheduled;
+  if (presentCountEl) presentCountEl.textContent = presentCount;
+  if (scheduledCountEl) scheduledCountEl.textContent = totalScheduled;
+
   // Calculate attendance rate
-  const attendanceRate = totalScheduled > 0 ? Math.round((presentCount / totalScheduled) * 100) : 0;
-  document.getElementById("attendance-rate").textContent = `${attendanceRate}%`;
-  
-  // Update summary counts
-  summary.forEach(item => {
-    const element = document.getElementById(`${item.attendance_status}-count`);
-    if (element) {
-      element.textContent = item.count;
-    }
-  });
+  const attendanceRate =
+    totalScheduled > 0 ? Math.round((presentCount / totalScheduled) * 100) : 0;
+  if (attendanceRateEl) attendanceRateEl.textContent = `${attendanceRate}%`;
 }
 
-// Render attendance tables
-function renderAttendanceTables(data) {
-  // Render recorded attendance
-  renderRecordedAttendance(data.attendance || []);
-  
-  // Render scheduled only
-  renderScheduledAttendance(data.scheduled || []);
-  
-  // Render other employees
-  renderOtherAttendance(data.otherEmployees || []);
-}
-
-// Render recorded attendance table
-function renderRecordedAttendance(attendanceList) {
+// Render attendance table
+function renderAttendanceTable() {
   const tbody = document.getElementById("recorded-attendance-body");
   if (!tbody) return;
 
-  if (attendanceList.length === 0) {
+  if (attendanceData.length === 0) {
     tbody.innerHTML = `
       <tr>
         <td colspan="7" class="text-center py-4">
           <i class="bi bi-people text-muted fs-1"></i>
-          <p class="mt-2 text-muted">No recorded attendance found</p>
+          <p class="mt-2 text-muted">No scheduled employees for this date</p>
         </td>
       </tr>
     `;
     return;
   }
 
-  tbody.innerHTML = attendanceList.map((item, index) => {
-    const statusClass = getStatusBadgeClass(item.attendance_status);
-    const scheduleClass = getScheduleBadgeClass(item.schedule_status);
-    
-    return `
+  tbody.innerHTML = attendanceData
+    .map((item) => {
+      const statusClass = getStatusBadgeClass(item.attendance_status);
+      const statusText = getStatusText(item.attendance_status);
+      const isEdited = item.is_edited || item.attendance_id !== null;
+
+      // Escape semua teks untuk mencegah XSS
+      const name = escapeHtml(item.name || "Unknown");
+      const position = escapeHtml(item.position || "-");
+      const remarks = escapeHtml(item.remarks || item.schedule_notes || "-");
+      const shiftName = escapeHtml(item.shift_name || "");
+      const locationName = escapeHtml(item.location_name || "");
+      const equipmentCode = escapeHtml(item.equipment_code || "");
+
+      return `
       <tr>
         <td>
           <div class="d-flex align-items-center">
-            <i class="bi bi-person-circle me-2 text-primary"></i>
+            <div class="me-3">
+              <i class="bi bi-person-circle fs-4 text-primary"></i>
+            </div>
             <div>
-              <strong>${item.name || "-"}</strong>
-              <div class="text-muted small">
-                ${item.position || "-"}
-                <span class="badge ${scheduleClass} ms-2">${item.schedule_status}</span>
-              </div>
+              <strong class="d-block">${name}</strong>
+              <small class="text-muted">${position}</small>
             </div>
           </div>
         </td>
-        <td>${item.position || "-"}</td>
+        <td>${position}</td>
         <td>
-          <span class="badge ${scheduleClass}">
-            ${item.schedule_status}
-          </span>
+          <span class="badge bg-primary">Scheduled</span>
         </td>
         <td>
-          <select class="form-select form-select-sm attendance-status" 
-                  data-employee-id="${item.employee_id}"
-                  data-type="attendance">
-            <option value="present" ${item.attendance_status === 'present' ? 'selected' : ''}>Present</option>
-            <option value="sick" ${item.attendance_status === 'sick' ? 'selected' : ''}>Sick</option>
-            <option value="permission" ${item.attendance_status === 'permission' ? 'selected' : ''}>Permission</option>
-            <option value="absent" ${item.attendance_status === 'absent' ? 'selected' : ''}>Absent</option>
-            <option value="leave" ${item.attendance_status === 'leave' ? 'selected' : ''}>Leave</option>
-          </select>
+          <span class="${statusClass}">${statusText}</span>
+          ${
+            isEdited
+              ? '<span class="badge bg-light text-dark border ms-1">Edited</span>'
+              : ""
+          }
         </td>
         <td>
-          <input type="text" class="form-control form-control-sm attendance-remarks" 
-                 data-employee-id="${item.employee_id}"
-                 placeholder="Remarks..."
-                 value="${item.remarks || ''}">
+          <div class="small text-muted">${remarks}</div>
         </td>
         <td>
-          ${item.shift_name ? `
-            <div class="small">
-              <i class="bi bi-clock me-1"></i>${item.shift_name}
-              ${item.location_name ? `<br><i class="bi bi-geo-alt me-1"></i>${item.location_name}` : ''}
-            </div>
-          ` : '<span class="text-muted">-</span>'}
+          <div class="small">
+            ${
+              shiftName
+                ? `<div><i class="bi bi-clock me-1"></i> ${shiftName}</div>`
+                : ""
+            }
+            ${
+              locationName
+                ? `<div><i class="bi bi-geo-alt me-1"></i> ${locationName}</div>`
+                : ""
+            }
+            ${
+              equipmentCode
+                ? `<div><i class="bi bi-truck me-1"></i> ${equipmentCode}</div>`
+                : ""
+            }
+          </div>
         </td>
         <td class="text-end">
-          <button class="btn btn-sm btn-outline-primary" onclick="saveSingleAttendance(${item.employee_id})">
-            <i class="bi bi-save"></i>
+          <button class="btn btn-sm btn-outline-primary edit-btn" 
+                  data-employee-id="${item.employee_id}"
+                  data-status="${item.attendance_status}"
+                  data-remarks="${escapeHtml(item.remarks || "")}"
+                  data-name="${name}">
+            <i class="bi bi-pencil"></i> Edit
           </button>
         </td>
       </tr>
     `;
-  }).join('');
-}
+    })
+    .join("");
 
-// Render scheduled only table
-function renderScheduledAttendance(scheduledList) {
-  const tbody = document.getElementById("scheduled-attendance-body");
-  if (!tbody) return;
+  // Add event listeners to edit buttons
+  document.querySelectorAll(".edit-btn").forEach((button) => {
+    button.addEventListener("click", function () {
+      const employeeId = this.getAttribute("data-employee-id");
+      const currentStatus = this.getAttribute("data-status");
+      const currentRemarks = this.getAttribute("data-remarks");
+      const employeeName = this.getAttribute("data-name");
 
-  if (scheduledList.length === 0) {
-    tbody.innerHTML = `
-      <tr>
-        <td colspan="7" class="text-center py-4">
-          <i class="bi bi-calendar-check text-muted fs-1"></i>
-          <p class="mt-2 text-muted">No scheduled employees without attendance</p>
-        </td>
-      </tr>
-    `;
-    return;
-  }
-
-  tbody.innerHTML = scheduledList.map((item, index) => {
-    return `
-      <tr>
-        <td>
-          <div class="d-flex align-items-center">
-            <i class="bi bi-person-circle me-2 text-primary"></i>
-            <div>
-              <strong>${item.name || "-"}</strong>
-              <div class="text-muted small">${item.position || "-"}</div>
-            </div>
-          </div>
-        </td>
-        <td>${item.position || "-"}</td>
-        <td>
-          <span class="badge badge-scheduled">Scheduled</span>
-        </td>
-        <td>
-          <select class="form-select form-select-sm attendance-status" 
-                  data-employee-id="${item.employee_id}"
-                  data-type="scheduled">
-            <option value="">-- Select Status --</option>
-            <option value="present">Present</option>
-            <option value="sick">Sick</option>
-            <option value="permission">Permission</option>
-            <option value="absent">Absent</option>
-            <option value="leave">Leave</option>
-          </select>
-        </td>
-        <td>
-          <input type="text" class="form-control form-control-sm attendance-remarks" 
-                 data-employee-id="${item.employee_id}"
-                 placeholder="Remarks...">
-        </td>
-        <td>
-          ${item.shift_name ? `
-            <div class="small">
-              <i class="bi bi-clock me-1"></i>${item.shift_name}
-              ${item.location_name ? `<br><i class="bi bi-geo-alt me-1"></i>${item.location_name}` : ''}
-            </div>
-          ` : '<span class="text-muted">-</span>'}
-        </td>
-        <td class="text-end">
-          <button class="btn btn-sm btn-outline-primary" onclick="saveSingleAttendance(${item.employee_id})">
-            <i class="bi bi-save"></i>
-          </button>
-        </td>
-      </tr>
-    `;
-  }).join('');
-}
-
-// Render other employees table
-function renderOtherAttendance(otherList) {
-  const tbody = document.getElementById("other-attendance-body");
-  if (!tbody) return;
-
-  if (otherList.length === 0) {
-    tbody.innerHTML = `
-      <tr>
-        <td colspan="6" class="text-center py-4">
-          <i class="bi bi-people text-muted fs-1"></i>
-          <p class="mt-2 text-muted">No other employees found</p>
-        </td>
-      </tr>
-    `;
-    return;
-  }
-
-  tbody.innerHTML = otherList.map((item, index) => {
-    return `
-      <tr>
-        <td>
-          <div class="d-flex align-items-center">
-            <i class="bi bi-person-circle me-2 text-primary"></i>
-            <div>
-              <strong>${item.name || "-"}</strong>
-              <div class="text-muted small">${item.position || "-"}</div>
-            </div>
-          </div>
-        </td>
-        <td>${item.position || "-"}</td>
-        <td>
-          <span class="badge badge-not-scheduled">Not Scheduled</span>
-        </td>
-        <td>
-          <select class="form-select form-select-sm attendance-status" 
-                  data-employee-id="${item.employee_id}"
-                  data-type="other">
-            <option value="">-- Select Status --</option>
-            <option value="present">Present</option>
-            <option value="sick">Sick</option>
-            <option value="permission">Permission</option>
-            <option value="absent">Absent</option>
-            <option value="leave">Leave</option>
-          </select>
-        </td>
-        <td>
-          <input type="text" class="form-control form-control-sm attendance-remarks" 
-                 data-employee-id="${item.employee_id}"
-                 placeholder="Remarks...">
-        </td>
-        <td class="text-end">
-          <button class="btn btn-sm btn-outline-primary" onclick="saveSingleAttendance(${item.employee_id})">
-            <i class="bi bi-save"></i>
-          </button>
-        </td>
-      </tr>
-    `;
-  }).join('');
-}
-
-// Save single attendance
-async function saveSingleAttendance(employeeId) {
-  if (!currentDate) {
-    showToast("warning", "Warning", "Please select a date first");
-    return;
-  }
-
-  const statusSelect = document.querySelector(`.attendance-status[data-employee-id="${employeeId}"]`);
-  const remarksInput = document.querySelector(`.attendance-remarks[data-employee-id="${employeeId}"]`);
-  
-  if (!statusSelect || !statusSelect.value) {
-    showToast("warning", "Warning", "Please select an attendance status");
-    return;
-  }
-
-  const attendanceData = {
-    attendance_status: statusSelect.value,
-    remarks: remarksInput ? remarksInput.value : '',
-  };
-
-  try {
-    await updateAttendance(currentDate, employeeId, attendanceData);
-    showToast("success", "Success", "Attendance saved successfully");
-    
-    setTimeout(() => {
-      loadDailyAttendance();
-    }, 500);
-    
-  } catch (error) {
-    console.error("Error saving attendance:", error);
-    showToast("danger", "Error", error.message || "Failed to save attendance");
-  }
-}
-
-// Save all attendance
-async function saveAllAttendance() {
-  if (!currentDate) {
-    showToast("warning", "Warning", "Please select a date first");
-    return;
-  }
-
-  const attendanceList = [];
-  
-  // Collect from all tabs
-  const statusSelects = document.querySelectorAll('.attendance-status');
-  statusSelects.forEach(select => {
-    if (select.value) { 
-      const employeeId = select.getAttribute('data-employee-id');
-      const remarksInput = document.querySelector(`.attendance-remarks[data-employee-id="${employeeId}"]`);
-      
-      attendanceList.push({
-        employee_id: parseInt(employeeId),
-        attendance_status: select.value,
-        remarks: remarksInput ? remarksInput.value : ''
-      });
-    }
+      openEditModal(employeeId, currentStatus, currentRemarks, employeeName);
+    });
   });
-
-  if (attendanceList.length === 0) {
-    showToast("warning", "Warning", "No attendance data to save");
-    return;
-  }
-
-  try {
-    await batchUpdateDailyAttendance(currentDate, attendanceList);
-    showToast("success", "Success", `Attendance saved for ${attendanceList.length} employees`);
-    
-    setTimeout(() => {
-      loadDailyAttendance();
-    }, 500);
-    
-  } catch (error) {
-    console.error("Error saving batch attendance:", error);
-    showToast("danger", "Error", error.message || "Failed to save attendance");
-  }
 }
 
+// Open edit modal
+function openEditModal(
+  employeeId,
+  currentStatus,
+  currentRemarks,
+  employeeName
+) {
+  const modal = new bootstrap.Modal(document.getElementById("quickEditModal"));
 
-async function quickEditAttendance(employeeId, currentStatus = '', currentRemarks = '') {
-  const modal = new bootstrap.Modal(document.getElementById('quickEditModal'));
-  const employee = await findEmployeeById(employeeId);
-  
-  if (employee) {
-    document.getElementById('edit_employee_id').value = employeeId;
-    document.getElementById('edit_employee_name').value = `${employee.name} - ${employee.position}`;
-    document.getElementById('edit_attendance_status').value = currentStatus;
-    document.getElementById('edit_remarks').value = currentRemarks || '';
-    
-    modal.show();
-  } else {
-    showToast("warning", "Warning", "Employee not found");
-  }
-}
+  // Set form values
+  document.getElementById("edit_employee_id").value = employeeId;
+  document.getElementById("edit_employee_name").value = `${employeeName}`;
+  document.getElementById("edit_attendance_status").value = currentStatus;
+  document.getElementById("edit_remarks").value = currentRemarks || "";
 
-// Find employee by ID
-async function findEmployeeById(employeeId) {
-  try {
-    const response = await getAllActiveEmployees();
-    if (response.ok && response.data) {
-      return response.data.find(emp => emp.employee_id == employeeId);
-    }
-  } catch (error) {
-    console.error("Error finding employee:", error);
-  }
-  return null;
+  modal.show();
 }
 
 // Save quick edit
 async function saveQuickEdit() {
-  const employeeId = document.getElementById('edit_employee_id').value;
-  const status = document.getElementById('edit_attendance_status').value;
-  const remarks = document.getElementById('edit_remarks').value;
+  const employeeId = document.getElementById("edit_employee_id").value;
+  const status = document.getElementById("edit_attendance_status").value;
+  const remarks = document.getElementById("edit_remarks").value;
 
   if (!employeeId || !status) {
-    showToast("warning", "Warning", "Please fill all required fields");
+    showToast("warning", "Warning", "Please select attendance status");
     return;
   }
 
   const attendanceData = {
     attendance_status: status,
-    remarks: remarks
+    remarks: remarks || null,
   };
 
   try {
-    await updateAttendance(currentDate, employeeId, attendanceData);
-    
-    const modal = bootstrap.Modal.getInstance(document.getElementById('quickEditModal'));
-    modal.hide();
-    
-    showToast("success", "Success", "Attendance updated successfully");
-   
-    loadDailyAttendance();
-    
+    console.log("Sending update:", {
+      date: currentDate,
+      employeeId,
+      attendanceData,
+    });
+
+    const result = await updateAttendance(
+      currentDate,
+      employeeId,
+      attendanceData
+    );
+
+    // Close modal
+    const modal = bootstrap.Modal.getInstance(
+      document.getElementById("quickEditModal")
+    );
+    if (modal) modal.hide();
+
+    showToast(
+      "success",
+      "Success",
+      result.message || "Attendance updated successfully"
+    );
+
+    // Reload data
+    setTimeout(() => {
+      loadDailyAttendance();
+    }, 500);
   } catch (error) {
     console.error("Error saving quick edit:", error);
-    showToast("danger", "Error", error.message || "Failed to update attendance");
+    showToast(
+      "danger",
+      "Error",
+      error.message ||
+        "Failed to update attendance. Please check console for details."
+    );
   }
+}
+
+// Refresh data
+function refreshData() {
+  loadDailyAttendance();
 }
 
 // Logout function
@@ -573,36 +393,38 @@ function logout() {
 
 // Initialize the page
 function initializePage() {
-
+  // Initialize date picker
   initializeDatePickers();
-  
+
+  // Set current date if not set
   if (!currentDate) {
-    const today = new Date().toISOString().split('T')[0];
+    const today = new Date().toISOString().split("T")[0];
     currentDate = today;
   }
-  
+
+  // Load initial data
   loadDailyAttendance();
-  
+
+  // Update time every second
   setInterval(updateTime, 1000);
   updateTime();
-  
-  document.getElementById('save-all-btn')?.addEventListener('click', saveAllAttendance);
-  document.getElementById('refresh-btn')?.addEventListener('click', loadDailyAttendance);
-  document.getElementById('btn-save-quick-edit')?.addEventListener('click', saveQuickEdit);
-  document.getElementById('logout-btn')?.addEventListener('click', logout);
-  
-  // Auto-refresh
+
+  // Event listeners
+  document
+    .getElementById("refresh-btn")
+    ?.addEventListener("click", refreshData);
+  document
+    .getElementById("btn-save-quick-edit")
+    ?.addEventListener("click", saveQuickEdit);
+  document.getElementById("logout-btn")?.addEventListener("click", logout);
+
+  // Auto-refresh every 30 seconds (optional)
   setInterval(() => {
     if (currentDate) loadDailyAttendance();
   }, 30000);
 }
 
-window.saveSingleAttendance = saveSingleAttendance;
-window.quickEditAttendance = quickEditAttendance;
-window.saveQuickEdit = saveQuickEdit;
-window.logout = logout;
-
-
+// Initialize when DOM is ready
 if (document.readyState === "loading") {
   document.addEventListener("DOMContentLoaded", initializePage);
 } else {

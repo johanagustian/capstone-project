@@ -6,6 +6,7 @@ import {
 } from "../models/daily_attendance_model.js";
 
 // Get all attendance data for date
+// Get all attendance data for date
 export const getDailyAttendance = async (req, res) => {
   try {
     const { date } = req.query;
@@ -21,7 +22,7 @@ export const getDailyAttendance = async (req, res) => {
     const summary = await getAttendanceSummary(date);
 
     res.json({
-      message: data.message || "GET daily attendance success",
+      message: "GET daily attendance success",
       data: {
         ...data,
         summary: summary.summary,
@@ -44,6 +45,8 @@ export const updateAttendance = async (req, res) => {
     const { date, employee_id } = req.params;
     const { attendance_status, remarks } = req.body;
 
+    console.log("updateAttendance called with:", { date, employee_id, attendance_status, remarks });
+
     if (!date || !employee_id || !attendance_status) {
       return res.status(400).json({
         message: "Date, employee_id, and attendance_status are required",
@@ -51,32 +54,30 @@ export const updateAttendance = async (req, res) => {
       });
     }
 
-    // First, check if employee is scheduled for this date
-    const [scheduled] = await req.dbPool.execute(
-      `SELECT 1 FROM weekly_schedule 
-       WHERE date = ? AND employee_id = ?`,
-      [date, employee_id]
-    );
-
-    if (scheduled.length === 0) {
+    // Validasi attendance_status
+    const validStatuses = ['present', 'sick', 'permission', 'absent', 'leave'];
+    if (!validStatuses.includes(attendance_status)) {
       return res.status(400).json({
-        message: "Employee is not scheduled for this date",
+        message: "Invalid attendance status",
         data: null,
       });
     }
 
-    const result = await upsertDailyAttendance(date, employee_id, {
+    // LANGSUNG UPDATE TANPA CEK JADWAL
+    const result = await upsertDailyAttendance(date, parseInt(employee_id), {
       attendance_status,
       remarks: remarks || null,
     });
+
+    console.log("upsert result:", result);
 
     res.json({
       message: "Attendance updated successfully",
       data: {
         date,
-        employee_id,
+        employee_id: parseInt(employee_id),
         attendance_status,
-        remarks,
+        remarks: remarks || null,
         attendance_id: result.attendance_id,
       },
     });
